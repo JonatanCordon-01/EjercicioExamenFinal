@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado del Agua - Interactivo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #cce6ff, #e6f3ff);
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 { color: #003366; margin-bottom: 10px; }
+        .card {
+            background: white;
+            padding: 20px;
+            max-width: 420px;
+            margin: auto;
+            border-radius: 18px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: fadeIn 1s;
+        }
+        @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+        input {
+            width: 160px;
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 8px;
+            border: 1px solid #aaa;
+            margin-top: 10px;
+        }
+        button {
+            padding: 12px 22px;
+            margin-top: 15px;
+            background: #0077cc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background: #005fa3; }
+        #resultado { font-size: 20px; margin-top: 15px; }
+
+        /* Termómetro visual */
+        .thermo-container {
+            width: 90px;
+            height: 260px;
+            margin: 25px auto;
+            background: #eee;
+            border-radius: 50px;
+            border: 3px solid #666;
+            position: relative;
+            overflow: hidden;
+        }
+        .thermo-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0%;
+            background: blue;
+            transition: height 0.8s ease, background 0.5s;
+        }
+
+        /* Barra animada */
+        #barra {
+            width: 100%;
+            height: 20px;
+            background: #ddd;
+            border-radius: 30px;
+            margin-top: 20px;
+        }
+        #relleno {
+            height: 100%;
+            width: 0%;
+            background: grey;
+            border-radius: 30px;
+            transition: width 0.6s ease, background 0.5s;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .card { width: 90%; padding: 15px; }
+            input { width: 90%; }
+        }
+            /* Modo oscuro */
+        body.dark {
+            background: #0d1117;
+            color: white;
+        }
+        body.dark .card {
+            background: #161b22;
+            color: white;
+            box-shadow: 0 4px 20px rgba(255,255,255,0.15);
+        }
+        body.dark input {
+            background: #0d1117;
+            border: 1px solid #555;
+            color: white;
+        }
+        body.dark button {
+            background: #238636;
+        }
+        body.dark button:hover {
+            background: #1a662a;
+        }
+
+        /* Botón de modo oscuro */
+        .toggle-dark {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 12px 18px;
+            background: #222;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        /* Botones táctiles grandes */
+        button {
+            padding: 16px 28px;
+            font-size: 20px;
+            border-radius: 12px;
+        }
+        
+</style>
+</head>
+<body>
+
+    <h1>Estado del Agua según Temperatura</h1>
+
+    <div class="card">
+        <label>Ingrese temperatura en °C:</label><br>
+        <input type="number" id="tempC" step="0.1"><br>
+        <button onclick="calcular()">Ver resultado</button>
+
+        <div id="resultado"></div>
+
+        <!-- Termómetro -->
+        <div class="thermo-container">
+            <div id="thermoFill" class="thermo-fill"></div>
+        </div>
+
+        <!-- Barra -->
+        <div id="barra"><div id="relleno"></div></div>
+    </div>
+
+<script>
+function calcular() {
+    let celsius = parseFloat(document.getElementById("tempC").value);
+
+    if (isNaN(celsius)) {
+        document.getElementById("resultado").innerHTML =
+            "<span style='color:red'>Por favor ingrese un número válido.</span>";
+        return;
+    }
+
+    let fahrenheit = (celsius * 9/5) + 32;
+    let estado = "";
+    let color = "";
+
+    if (celsius > 100) { estado = "GAS (Vapor)"; color = "orange"; }
+    else if (celsius === 100) { estado = "Condensación"; color = "gold"; }
+    else if (celsius < 100 && celsius > 0) { estado = "LÍQUIDO"; color = "blue"; }
+    else if (celsius === 0) { estado = "Solidificación"; color = "purple"; }
+    else if (celsius < 0) { estado = "SÓLIDO (Hielo)"; color = "cyan"; }
+
+    document.getElementById("resultado").innerHTML =
+        "<br>Temperatura en Fahrenheit: <strong>" + fahrenheit.toFixed(2) +
+        " °F</strong><br>Estado del agua: <strong style='color:" + color +
+        "'>" + estado + "</strong>";
+
+    let porcentaje = (celsius + 20) * 0.6;
+    porcentaje = Math.max(0, Math.min(100, porcentaje));
+
+    document.getElementById("relleno").style.width = porcentaje + "%";
+    document.getElementById("relleno").style.background = color;
+
+    document.getElementById("thermoFill").style.height = porcentaje + "%";
+    document.getElementById("thermoFill").style.background = color;
+}
+</script>
+</body>
+</html>
